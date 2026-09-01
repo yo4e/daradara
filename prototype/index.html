@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3efe8">
+  <title>ダラリカ / darareco</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="screen active" data-screen="start">
+      <p class="eyebrow">ダラリカ / darareco</p>
+      <h1>だらだらすることを、<br>ちゃんと選べるようにする。</h1>
+      <p class="lead">理由をうまく説明できなくても大丈夫。いま休みたいなら、それで始められます。</p>
+      <button class="primary" data-action="start">いま休む</button>
+    </section>
+
+    <section class="screen" data-screen="checkin" aria-labelledby="checkin-title">
+      <p class="step">1 / 4</p>
+      <h2 id="checkin-title">いま、どんな感じ？</h2>
+      <p class="muted">ひとつだけ選んでも、選ばなくても大丈夫。</p>
+      <div class="choice-list" id="checkinChoices">
+        <button class="choice" data-checkin="head">頭が疲れている</button>
+        <button class="choice" data-checkin="body">身体が疲れている</button>
+        <button class="choice" data-checkin="stimulus">刺激に疲れている</button>
+        <button class="choice" data-checkin="sleepy">眠い</button>
+        <button class="choice" data-checkin="rest">なんとなく休みたい</button>
+      </div>
+      <div class="actions">
+        <button class="primary" data-action="checkin-next">このまま進む</button>
+        <button class="text-button" data-action="checkin-skip">選ばず進む</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="menu" aria-labelledby="menu-title">
+      <p class="step">2 / 4</p>
+      <h2 id="menu-title">いま選ぶなら、この3つ。</h2>
+      <p class="muted">正解を当てなくていい。いちばん負担の少ないものを。</p>
+      <div class="choice-list" id="recoveryChoices"></div>
+    </section>
+
+    <section class="screen" data-screen="session" aria-labelledby="session-title">
+      <p class="step">3 / 4</p>
+      <h2 id="session-title">休む時間。</h2>
+      <p class="session-name" id="sessionName"></p>
+      <div class="timer" id="timer" aria-live="polite">10:00</div>
+      <p class="muted" id="timerMessage">画面は閉じても、そのままでも大丈夫。</p>
+
+      <form class="parking" id="parkingForm">
+        <label for="parkingInput">思いついたことは、ここに置いておく</label>
+        <div class="parking-row">
+          <input id="parkingInput" maxlength="120" autocomplete="off" placeholder="あとでやることを一行だけ">
+          <button type="submit" class="secondary">置く</button>
+        </div>
+        <p class="parking-status" id="parkingStatus" aria-live="polite"></p>
+      </form>
+
+      <button class="text-button end-session" data-action="end-session">休みを終える</button>
+    </section>
+
+    <section class="screen" data-screen="reflection" aria-labelledby="reflection-title">
+      <div id="reflectionForm">
+        <p class="step">4 / 4</p>
+        <h2 id="reflection-title">少し休めた？</h2>
+        <p class="muted">記録したくなければ、そのまま終えて大丈夫。</p>
+        <div class="choice-list compact">
+          <button class="choice" data-reflection="rested">少し休めた</button>
+          <button class="choice" data-reflection="same">変わらない</button>
+          <button class="choice" data-reflection="stopped">途中でやめた</button>
+        </div>
+        <button class="text-button" data-reflection="">記録せず終える</button>
+      </div>
+      <div class="done" id="doneMessage" hidden>
+        <p class="eyebrow">ダラリカ / darareco</p>
+        <h2>今日はここまで。</h2>
+        <p class="lead">休めたかどうかを採点しなくて大丈夫。選んだことだけ、ここに置いておきます。</p>
+        <button class="text-button" data-action="reset">最初の画面へ</button>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
