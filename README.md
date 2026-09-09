@@ -27,14 +27,16 @@ MVP v2 は次の流れに絞ります。
 
 ## プロトタイプ
 
-`prototype/` に、ビルド不要の最小プロトタイプがあります。
+**Live:** https://yo4e.github.io/daradara/
+
+`prototype/` に同じビルド不要のプロトタイプがあります。ローカルで試す場合は次の通りです。
 
 ```bash
 cd prototype
 python3 -m http.server 8000
 ```
 
-ブラウザで `http://localhost:8000` を開くと、次の中心ループを試せます。
+中心ループ:
 
 ```text
 続けそうになる
