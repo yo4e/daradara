@@ -4,7 +4,7 @@ const restCue = document.querySelector('#restCue');
 const restTimeMessage = document.querySelector('#restTimeMessage');
 const restParkingPanel = document.querySelector('#restParkingPanel');
 const restParkingInput = document.querySelector('#restParkingInput');
-const exitTitle = document.querySelector('#exitTitle');
+const exitTitle = document.querySelector('#exit-title');
 const exitMessage = document.querySelector('#exitMessage');
 
 const REST_MINUTES = 5;
