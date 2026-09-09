@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3efe8">
+  <title>ダラリカ / darareco</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="screen active" data-screen="start">
+      <p class="eyebrow">ダラリカ / darareco</p>
+      <h1>もう一つやる前に、<br>一回だけ止まる。</h1>
+      <p class="lead">仕事でも、SNSでも、動画でも、返信でも。止められる場所ではなく、続ける前に選び直す場所。</p>
+      <div class="actions">
+        <button class="primary" data-action="pause">いったん止まる</button>
+        <button class="secondary wide" data-action="park-first">思いつきだけ預ける</button>
+        <button class="text-button" data-action="continue">このまま続ける</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="unwind" aria-labelledby="unwind-title">
+      <p class="eyebrow">ほどく</p>
+      <h2 id="unwind-title">いま、いちばん減らしたいものは？</h2>
+      <p class="muted">疲れの名前を当てなくていい。近いものを一つだけ。</p>
+      <div class="choice-list">
+        <button class="choice" data-unwind="thinking">考えること<small>答えや判断を増やさない</small></button>
+        <button class="choice" data-unwind="body">身体を使うこと<small>身体をどこかに預ける</small></button>
+        <button class="choice" data-unwind="stimulus">画面や音の刺激<small>情報をこれ以上増やさない</small></button>
+        <button class="choice" data-unwind="unsure">わからない。とにかく止まりたい<small>理由を決めなくていい</small></button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="park" aria-labelledby="park-title">
+      <p class="eyebrow">Thought Parking</p>
+      <h2 id="park-title">それだけ、未来に置く。</h2>
+      <p class="muted">忘れたくないことを一行だけ。ここでは処理しない。</p>
+      <form class="parking standalone" data-parking-form data-source="gate">
+        <label for="gateParkingInput">頭から離れないこと</label>
+        <div class="parking-row">
+          <input id="gateParkingInput" data-parking-input maxlength="120" autocomplete="off" placeholder="あとで返信する">
+          <button type="submit" class="secondary">預ける</button>
+        </div>
+        <p class="parking-status" data-parking-status aria-live="polite"></p>
+      </form>
+      <button class="text-button" data-action="park-skip">書かずに、そのまま止まる</button>
+    </section>
+
+    <section class="screen" data-screen="rest" aria-labelledby="rest-title">
+      <p class="eyebrow">Rest Mode</p>
+      <h2 id="rest-title">いまは、次を決めない。</h2>
+      <p class="rest-cue" id="restCue"></p>
+
+      <div class="quiet-field" aria-hidden="true">
+        <span>何もしなくていい</span>
+      </div>
+      <p class="quiet-note">この動きに呼吸や操作を合わせなくて大丈夫。</p>
+      <p class="muted rest-time" id="restTimeMessage" aria-live="polite">5分くらいを目安に。画面から離れても、そのままでも大丈夫。</p>
+
+      <div class="rest-actions">
+        <button class="secondary wide" data-action="toggle-rest-parking">また思いついた</button>
+        <div class="rest-parking" id="restParkingPanel" hidden>
+          <form class="parking" data-parking-form data-source="rest">
+            <label for="restParkingInput">未来に置く</label>
+            <div class="parking-row">
+              <input id="restParkingInput" data-parking-input maxlength="120" autocomplete="off" placeholder="一行だけ">
+              <button type="submit" class="secondary">預ける</button>
+            </div>
+            <p class="parking-status" data-parking-status aria-live="polite"></p>
+          </form>
+          <button class="text-button" type="button" data-action="cancel-rest-parking">やめる</button>
+        </div>
+        <button class="text-button" data-action="end-rest">ここまでにする</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="exit" aria-labelledby="exit-title">
+      <p class="eyebrow">ダラリカ / darareco</p>
+      <h2 id="exit-title">ここまで。</h2>
+      <p class="lead" id="exitMessage"></p>
+      <button class="text-button" data-action="reset">最初の画面へ</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
