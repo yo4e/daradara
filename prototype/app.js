@@ -1,95 +1,40 @@
 const screens = [...document.querySelectorAll('.screen')];
-const checkinButtons = [...document.querySelectorAll('[data-checkin]')];
-const recoveryChoices = document.querySelector('#recoveryChoices');
-const timerEl = document.querySelector('#timer');
-const timerMessage = document.querySelector('#timerMessage');
-const sessionName = document.querySelector('#sessionName');
-const parkingForm = document.querySelector('#parkingForm');
-const parkingInput = document.querySelector('#parkingInput');
-const parkingStatus = document.querySelector('#parkingStatus');
-const reflectionForm = document.querySelector('#reflectionForm');
-const doneMessage = document.querySelector('#doneMessage');
+const parkingForms = [...document.querySelectorAll('[data-parking-form]')];
+const restCue = document.querySelector('#restCue');
+const restTimeMessage = document.querySelector('#restTimeMessage');
+const restParkingPanel = document.querySelector('#restParkingPanel');
+const restParkingInput = document.querySelector('#restParkingInput');
+const exitTitle = document.querySelector('#exitTitle');
+const exitMessage = document.querySelector('#exitMessage');
 
-const recoveryOptions = {
-  none: { label: '何もしない', minutes: 10, note: 'ただ休む。画面から離れてもいい。' },
-  'lie-down': { label: '横になる', minutes: 20, note: '眠らなくてもいい。身体を預ける。' },
-  outside: { label: '外を見る / 少し歩く', minutes: 10, note: '距離や歩数は決めない。' },
-  'warm-drink': { label: '温かい飲み物と休む', minutes: 10, note: '飲み終えることも目標にしない。' }
-};
+const REST_MINUTES = 5;
 
-const menus = {
-  head: ['none', 'outside', 'warm-drink'],
-  body: ['lie-down', 'outside', 'none'],
-  stimulus: ['none', 'outside', 'lie-down'],
-  sleepy: ['lie-down', 'none', 'warm-drink'],
-  rest: ['none', 'lie-down', 'warm-drink'],
-  default: ['none', 'lie-down', 'outside']
+const restCues = {
+  thinking: '答えを出さない時間にする。',
+  body: '身体をどこかに預けていい。',
+  stimulus: '情報をこれ以上増やさない。',
+  unsure: '理由を決めなくていい。',
+  thought: '預けた。忘れないから、いまはやらなくていい。'
 };
 
 let state = freshState();
-let timerId = null;
-let remainingSeconds = 0;
+let restTimeoutId = null;
 
 function freshState() {
   return {
-    checkIn: null,
-    recovery: null,
-    plannedMinutes: null,
+    entry: null,
+    unwind: null,
+    plannedMinutes: REST_MINUTES,
     startedAt: null,
-    endedAt: null
+    endedAt: null,
+    parkedCount: 0,
+    saved: false
   };
 }
 
 function showScreen(name) {
   screens.forEach(screen => screen.classList.toggle('active', screen.dataset.screen === name));
   window.scrollTo({ top: 0, behavior: 'instant' });
-}
-
-function renderMenu() {
-  const keys = menus[state.checkIn] || menus.default;
-  recoveryChoices.innerHTML = keys.map(key => {
-    const option = recoveryOptions[key];
-    return `
-      <button class="choice" data-recovery="${key}">
-        ${option.label} ${option.minutes}分
-        <small>${option.note}</small>
-      </button>`;
-  }).join('');
-}
-
-function selectCheckin(value) {
-  state.checkIn = value;
-  checkinButtons.forEach(button => {
-    button.classList.toggle('selected', button.dataset.checkin === value);
-  });
-}
-
-function startSession(key) {
-  const option = recoveryOptions[key];
-  state.recovery = key;
-  state.plannedMinutes = option.minutes;
-  state.startedAt = new Date().toISOString();
-  sessionName.textContent = `${option.label} · ${option.minutes}分`;
-  parkingStatus.textContent = '';
-  timerMessage.textContent = '画面は閉じても、そのままでも大丈夫。';
-  remainingSeconds = option.minutes * 60;
-  updateTimer();
-  clearInterval(timerId);
-  timerId = setInterval(() => {
-    remainingSeconds = Math.max(0, remainingSeconds - 1);
-    updateTimer();
-    if (remainingSeconds === 0) {
-      clearInterval(timerId);
-      timerMessage.textContent = '時間です。急いで戻らなくて大丈夫。';
-    }
-  }, 1000);
-  showScreen('session');
-}
-
-function updateTimer() {
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = remainingSeconds % 60;
-  timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function readList(key) {
@@ -104,66 +49,114 @@ function saveThought(text) {
   const thoughts = readList('darareco.thoughts');
   thoughts.push({ text, createdAt: new Date().toISOString() });
   localStorage.setItem('darareco.thoughts', JSON.stringify(thoughts));
+  state.parkedCount += 1;
 }
 
-function finishSession(reflection) {
-  clearInterval(timerId);
-  state.endedAt ||= new Date().toISOString();
+function saveSession() {
+  if (state.saved || !state.startedAt) return;
+
   const sessions = readList('darareco.sessions');
-  sessions.push({ ...state, reflection: reflection || null });
+  sessions.push({
+    entry: state.entry,
+    unwind: state.unwind,
+    plannedMinutes: state.plannedMinutes,
+    startedAt: state.startedAt,
+    endedAt: state.endedAt || new Date().toISOString(),
+    parkedCount: state.parkedCount
+  });
   localStorage.setItem('darareco.sessions', JSON.stringify(sessions));
-  reflectionForm.hidden = true;
-  doneMessage.hidden = false;
+  state.saved = true;
+}
+
+function startRest(unwind, entry = state.entry || 'pause') {
+  state.entry = entry;
+  state.unwind = unwind;
+  state.startedAt ||= new Date().toISOString();
+  state.endedAt = null;
+  state.saved = false;
+
+  restCue.textContent = restCues[unwind] || restCues.unsure;
+  restTimeMessage.textContent = `${REST_MINUTES}分くらいを目安に。画面から離れても、そのままでも大丈夫。`;
+  restParkingPanel.hidden = true;
+  clearParkingForms();
+
+  clearTimeout(restTimeoutId);
+  restTimeoutId = setTimeout(() => {
+    restTimeMessage.textContent = '目安の時間は過ぎた。急いで戻らなくて大丈夫。';
+  }, REST_MINUTES * 60 * 1000);
+
+  showScreen('rest');
+}
+
+function clearParkingForms() {
+  parkingForms.forEach(form => {
+    const input = form.querySelector('[data-parking-input]');
+    const status = form.querySelector('[data-parking-status]');
+    if (input) input.value = '';
+    if (status) status.textContent = '';
+  });
+}
+
+function showExit(kind) {
+  clearTimeout(restTimeoutId);
+
+  if (kind === 'continue') {
+    exitTitle.textContent = '続けるを選んだ。';
+    exitMessage.textContent = 'それでいい。いったん選び直したことだけで、この介入は終わり。';
+  } else {
+    exitTitle.textContent = 'ここまで。';
+    exitMessage.textContent = '続けても、まだ止まっていてもいい。ここから作業再開を急かすことはしない。';
+  }
+
+  showScreen('exit');
 }
 
 function reset() {
-  clearInterval(timerId);
+  clearTimeout(restTimeoutId);
   state = freshState();
-  checkinButtons.forEach(button => button.classList.remove('selected'));
-  reflectionForm.hidden = false;
-  doneMessage.hidden = true;
-  parkingInput.value = '';
-  parkingStatus.textContent = '';
+  clearParkingForms();
+  restParkingPanel.hidden = true;
   showScreen('start');
 }
 
 document.addEventListener('click', event => {
+  const unwindButton = event.target.closest('[data-unwind]');
+  if (unwindButton) {
+    startRest(unwindButton.dataset.unwind, 'pause');
+    return;
+  }
+
   const actionButton = event.target.closest('[data-action]');
-  const checkinButton = event.target.closest('[data-checkin]');
-  const recoveryButton = event.target.closest('[data-recovery]');
-  const reflectionButton = event.target.closest('[data-reflection]');
-
-  if (checkinButton) {
-    selectCheckin(checkinButton.dataset.checkin);
-    return;
-  }
-
-  if (recoveryButton) {
-    startSession(recoveryButton.dataset.recovery);
-    return;
-  }
-
-  if (reflectionButton) {
-    finishSession(reflectionButton.dataset.reflection);
-    return;
-  }
-
   if (!actionButton) return;
 
   switch (actionButton.dataset.action) {
-    case 'start':
-      showScreen('checkin');
+    case 'pause':
+      state.entry = 'pause';
+      showScreen('unwind');
       break;
-    case 'checkin-next':
-    case 'checkin-skip':
-      if (actionButton.dataset.action === 'checkin-skip') selectCheckin(null);
-      renderMenu();
-      showScreen('menu');
+    case 'park-first':
+      state.entry = 'park';
+      clearParkingForms();
+      showScreen('park');
       break;
-    case 'end-session':
-      clearInterval(timerId);
+    case 'continue':
+      showExit('continue');
+      break;
+    case 'park-skip':
+      startRest('unsure', 'park');
+      break;
+    case 'toggle-rest-parking':
+      restParkingPanel.hidden = false;
+      restParkingInput.focus();
+      break;
+    case 'cancel-rest-parking':
+      restParkingPanel.hidden = true;
+      restParkingInput.value = '';
+      break;
+    case 'end-rest':
       state.endedAt = new Date().toISOString();
-      showScreen('reflection');
+      saveSession();
+      showExit('rest');
       break;
     case 'reset':
       reset();
@@ -171,12 +164,27 @@ document.addEventListener('click', event => {
   }
 });
 
-parkingForm.addEventListener('submit', event => {
-  event.preventDefault();
-  const text = parkingInput.value.trim();
-  if (!text) return;
-  saveThought(text);
-  parkingInput.value = '';
-  parkingStatus.textContent = 'あとで見る箱に置きました。いまは戻らなくて大丈夫。';
-  parkingInput.blur();
+parkingForms.forEach(form => {
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const input = form.querySelector('[data-parking-input]');
+    const status = form.querySelector('[data-parking-status]');
+    const text = input.value.trim();
+    if (!text) return;
+
+    saveThought(text);
+    input.value = '';
+    input.blur();
+
+    if (form.dataset.source === 'gate') {
+      if (status) status.textContent = '預かりました。';
+      startRest('thought', 'park');
+      return;
+    }
+
+    restCue.textContent = restCues.thought;
+    if (status) status.textContent = '預けた。いまは戻らなくて大丈夫。';
+    restParkingPanel.hidden = true;
+  });
 });
