@@ -60,7 +60,9 @@ Web prototype は、他アプリを開こうとした瞬間を検知できない
 
 したがって v2 では **Boundary Gateを手動で起動する**。ここで検証するのは自動検知ではなく、境目にこの選択肢が現れたときの体験。
 
-将来の trigger layer は別問題として扱う。
+2026-09-13 の product viability 再調査により、trigger layer は単なる将来機能ではなく、**価値成立を検証すべき中心仮説の片翼**へ位置づけを変更する。
+
+現Web prototypeでは引き続き手動起動だが、次段では「必要な境目に自然に呼び出されることで、使う必然が生まれるか」を検証する。
 
 候補:
 
@@ -174,13 +176,38 @@ v2の最初の観察点は次。
 
 ### trigger layer
 
-Boundary Gateを「いつ自動で出すか」は重要だが、Web prototypeの中心メカニクスと分離して扱う。
+2026-09-13 の再調査で、**Standalone Web Appの手動起動だけでは継続利用理由が弱い**と判断した。
 
-### Parkingの後処理
+ダラリカはstreak、育成、daily content、詳細な履歴分析を意図的に持たない。その思想を維持するなら、ユーザーに毎回「休もう」「ダラリカを開こう」と思い出してもらうのではなく、必要な境目へダラリカ側から現れる仕組みを検証する必要がある。
 
-預けた内容をいつ見るかは未設計。
+ただし、高頻度の一律な摩擦はhabituation / attritionを招く可能性があるため、介入頻度を本人が制御できることを前提にする。
 
-休養中に一覧を見せることだけはしない。後から見る導線は、MVP中心ループが成立してから決める。
+次段の候補:
+
+- user-defined apps / sites
+- work session終了時
+- 夜間の限定時間帯
+- browser上の限定trigger
+- desktop shortcut / hotkey
+
+詳細: [`research/product-viability-retention.md`](research/product-viability-retention.md)
+
+### Parkingの後処理 — Return Window
+
+Thought Parkingをblack holeにしないため、後から内容を返す仕組みを価値成立に必要な要素として扱う。
+
+ただし、休養中・保存直後・Rest Mode終了直後には一覧を見せない。
+
+基本方針:
+
+1. Rest中は一行だけ預ける
+2. その場では内容を隠し、Rest Modeへ戻す
+3. 後刻の **Return Window** でまとめて返す
+4. Return Windowで「残す / 外部へ送る / 捨てる」を選べるようにする
+
+候補は、1日1回のquiet digest、翌日の最初の能動利用時、次のwork-start trigger、明示的なParking Inbox。
+
+Parking入力時に毎回due dateやreview時刻を聞くことはしない。
 
 ### Rest Modeの時間
 
