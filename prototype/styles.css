@@ -40,6 +40,17 @@ button { cursor: pointer; }
   letter-spacing: .08em;
 }
 
+.trigger-hint {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 1px solid rgba(76,70,60,.12);
+  border-radius: 14px;
+  background: rgba(255,255,255,.46);
+  color: #625e56;
+  font-size: .86rem;
+  line-height: 1.6;
+}
+
 h1, h2 {
   margin: 0;
   font-weight: 650;
@@ -60,7 +71,7 @@ h2 { font-size: clamp(1.7rem, 5vw, 2.35rem); }
 .rest-cue { margin: 16px 0 28px; font-size: 1.08rem; }
 .quiet-note { margin: 10px 0 0; font-size: .8rem; text-align: center; color: #817b70; }
 
-.primary, .secondary, .choice, .text-button {
+.primary, .secondary, .choice, .text-button, .return-action {
   border: 0;
   border-radius: 18px;
 }
@@ -104,6 +115,7 @@ h2 { font-size: clamp(1.7rem, 5vw, 2.35rem); }
 .choice small { display: block; margin-top: 5px; color: #777166; line-height: 1.55; }
 
 .actions { display: grid; gap: 10px; }
+
 .text-button {
   width: 100%;
   padding: 13px 16px;
@@ -111,6 +123,12 @@ h2 { font-size: clamp(1.7rem, 5vw, 2.35rem); }
   color: #6d685e;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.return-entry {
+  margin-top: 18px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(76,70,60,.09);
 }
 
 .parking {
@@ -128,6 +146,7 @@ h2 { font-size: clamp(1.7rem, 5vw, 2.35rem); }
 }
 
 .parking-row { display: flex; gap: 8px; }
+
 .parking-row input {
   min-width: 0;
   flex: 1;
@@ -192,6 +211,54 @@ h2 { font-size: clamp(1.7rem, 5vw, 2.35rem); }
 .rest-actions { margin-top: 30px; display: grid; gap: 8px; }
 .rest-parking { margin: 6px 0 2px; padding: 18px; border-radius: 18px; background: rgba(255,255,255,.38); }
 .rest-parking .parking { padding-top: 0; border-top: 0; }
+
+.return-list {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0 14px;
+}
+
+.return-card {
+  padding: 16px;
+  border: 1px solid rgba(76,70,60,.11);
+  border-radius: 18px;
+  background: rgba(255,255,255,.58);
+}
+
+.return-card__text {
+  margin: 0;
+  color: #34322d;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.return-card__meta {
+  margin: 8px 0 14px;
+  color: #817b70;
+  font-size: .78rem;
+}
+
+.return-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.return-action {
+  padding: 9px 13px;
+  background: #ded7ca;
+  color: #34322d;
+}
+
+.return-action.danger {
+  background: transparent;
+  color: #76655d;
+  border: 1px solid rgba(118,101,93,.24);
+}
+
+.return-status {
+  margin-bottom: 8px;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .screen.active, .quiet-field, .quiet-field::after { animation: none; }
