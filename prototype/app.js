@@ -6,8 +6,15 @@ const restParkingPanel = document.querySelector('#restParkingPanel');
 const restParkingInput = document.querySelector('#restParkingInput');
 const exitTitle = document.querySelector('#exit-title');
 const exitMessage = document.querySelector('#exitMessage');
+const triggerHint = document.querySelector('#triggerHint');
+const returnWindowButton = document.querySelector('#returnWindowButton');
+const returnList = document.querySelector('#returnList');
+const returnEmpty = document.querySelector('#returnEmpty');
+const returnStatus = document.querySelector('#returnStatus');
 
 const REST_MINUTES = 5;
+const THOUGHTS_KEY = 'darareco.thoughts';
+const SESSIONS_KEY = 'darareco.sessions';
 
 const restCues = {
   thinking: '答えを出さない時間にする。',
@@ -19,6 +26,10 @@ const restCues = {
 
 let state = freshState();
 let restTimeoutId = null;
+
+function getTriggerMode() {
+  return new URLSearchParams(window.location.search).get('trigger') === 'hotkey' ? 'hotkey' : null;
+}
 
 function freshState() {
   return {
@@ -34,28 +45,62 @@ function freshState() {
 
 function showScreen(name) {
   screens.forEach(screen => screen.classList.toggle('active', screen.dataset.screen === name));
+  if (name === 'start') syncStartScreen();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function readList(key) {
   try {
-    return JSON.parse(localStorage.getItem(key)) || [];
+    const value = JSON.parse(localStorage.getItem(key));
+    return Array.isArray(value) ? value : [];
   } catch {
     return [];
   }
 }
 
+function makeThoughtId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+  return `thought-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function readThoughts() {
+  const raw = readList(THOUGHTS_KEY);
+  let changed = false;
+  const thoughts = raw.map((thought, index) => {
+    if (thought && thought.id) return thought;
+    changed = true;
+    return {
+      ...thought,
+      id: `legacy-${thought?.createdAt || 'unknown'}-${index}`
+    };
+  });
+
+  if (changed) writeThoughts(thoughts);
+  return thoughts;
+}
+
+function writeThoughts(thoughts) {
+  localStorage.setItem(THOUGHTS_KEY, JSON.stringify(thoughts));
+}
+
 function saveThought(text) {
-  const thoughts = readList('darareco.thoughts');
-  thoughts.push({ text, createdAt: new Date().toISOString() });
-  localStorage.setItem('darareco.thoughts', JSON.stringify(thoughts));
+  const thoughts = readThoughts();
+  thoughts.push({
+    id: makeThoughtId(),
+    text,
+    createdAt: new Date().toISOString(),
+    reviewedAt: null
+  });
+  writeThoughts(thoughts);
   state.parkedCount += 1;
 }
 
 function saveSession() {
   if (state.saved || !state.startedAt) return;
 
-  const sessions = readList('darareco.sessions');
+  const sessions = readList(SESSIONS_KEY);
   sessions.push({
     entry: state.entry,
     unwind: state.unwind,
@@ -64,8 +109,14 @@ function saveSession() {
     endedAt: state.endedAt || new Date().toISOString(),
     parkedCount: state.parkedCount
   });
-  localStorage.setItem('darareco.sessions', JSON.stringify(sessions));
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
   state.saved = true;
+}
+
+function syncStartScreen() {
+  const isHotkey = getTriggerMode() === 'hotkey';
+  triggerHint.hidden = !isHotkey;
+  returnWindowButton.hidden = readThoughts().length === 0;
 }
 
 function startRest(unwind, entry = state.entry || 'pause') {
@@ -119,7 +170,133 @@ function reset() {
   showScreen('start');
 }
 
-document.addEventListener('click', event => {
+function formatThoughtDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('ja-JP', {
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+}
+
+function renderReturnWindow() {
+  const thoughts = readThoughts();
+  returnList.replaceChildren();
+  returnStatus.textContent = '';
+  returnEmpty.hidden = thoughts.length !== 0;
+
+  thoughts.forEach(thought => {
+    const card = document.createElement('article');
+    card.className = 'return-card';
+
+    const text = document.createElement('p');
+    text.className = 'return-card__text';
+    text.textContent = thought.text || '';
+
+    const meta = document.createElement('p');
+    meta.className = 'return-card__meta';
+    const created = formatThoughtDate(thought.createdAt);
+    meta.textContent = created ? `${created} に預けた` : '預けていたもの';
+
+    const actions = document.createElement('div');
+    actions.className = 'return-card__actions';
+
+    [
+      ['keep', '残す'],
+      ['copy', 'コピー'],
+      ['discard', '捨てる']
+    ].forEach(([action, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = action === 'discard' ? 'return-action danger' : 'return-action';
+      button.dataset.returnAction = action;
+      button.dataset.thoughtId = thought.id;
+      button.textContent = label;
+      actions.append(button);
+    });
+
+    card.append(text, meta, actions);
+    returnList.append(card);
+  });
+}
+
+function markThoughtReviewed(id) {
+  const thoughts = readThoughts();
+  const thought = thoughts.find(item => item.id === id);
+  if (!thought) return null;
+  thought.reviewedAt = new Date().toISOString();
+  writeThoughts(thoughts);
+  return thought;
+}
+
+function discardThought(id) {
+  const thoughts = readThoughts();
+  const next = thoughts.filter(item => item.id !== id);
+  if (next.length === thoughts.length) return false;
+  writeThoughts(next);
+  return true;
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.append(textarea);
+  textarea.select();
+  const copied = document.execCommand('copy');
+  textarea.remove();
+  if (!copied) throw new Error('copy failed');
+}
+
+async function handleReturnAction(button) {
+  const id = button.dataset.thoughtId;
+  const action = button.dataset.returnAction;
+
+  if (action === 'discard') {
+    if (discardThought(id)) {
+      returnStatus.textContent = '捨てました。';
+      renderReturnWindow();
+      returnStatus.textContent = '捨てました。';
+    }
+    return;
+  }
+
+  const thought = readThoughts().find(item => item.id === id);
+  if (!thought) return;
+
+  if (action === 'copy') {
+    try {
+      await copyText(thought.text || '');
+      markThoughtReviewed(id);
+      returnStatus.textContent = 'コピーしました。預けた内容は残しています。';
+    } catch {
+      returnStatus.textContent = 'コピーできませんでした。内容はそのまま残しています。';
+    }
+    return;
+  }
+
+  if (action === 'keep') {
+    markThoughtReviewed(id);
+    returnStatus.textContent = 'そのまま残しました。';
+  }
+}
+
+document.addEventListener('click', async event => {
+  const returnActionButton = event.target.closest('[data-return-action]');
+  if (returnActionButton) {
+    await handleReturnAction(returnActionButton);
+    return;
+  }
+
   const unwindButton = event.target.closest('[data-unwind]');
   if (unwindButton) {
     startRest(unwindButton.dataset.unwind, 'pause');
@@ -158,6 +335,13 @@ document.addEventListener('click', event => {
       saveSession();
       showExit('rest');
       break;
+    case 'open-return':
+      renderReturnWindow();
+      showScreen('return');
+      break;
+    case 'return-done':
+      showScreen('start');
+      break;
     case 'reset':
       reset();
       break;
@@ -188,3 +372,5 @@ parkingForms.forEach(form => {
     restParkingPanel.hidden = true;
   });
 });
+
+syncStartScreen();

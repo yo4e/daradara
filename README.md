@@ -39,7 +39,7 @@ python3 -m http.server 8000
 中心ループ:
 
 ```text
-続けそうになる
+desktop shortcut / hotkey
   ↓
 Boundary Gate
   ├─ 続ける → 終了
@@ -47,15 +47,28 @@ Boundary Gate
   └─ 思いつきを預ける → Rest Mode
                          ↑
                          └─ Thought Parking
+
+[後刻、自分で開く]
+Parking Inbox → 残す / コピー / 捨てる
 ```
 
-### 現段階の重要な制約
+### Issue #7 の limited trigger / Return Window
 
-このWeb prototype は、他アプリや別サイトを開こうとした瞬間を自動検知しません。
+limited trigger は **desktop shortcut / hotkey** だけを試します。
 
-いま検証するのは **「境目にこの介入があったら使えるか」** という中心メカニクスです。Shortcut、browser extension、OS automationなどの trigger layer は、このループを実機で確認してから検討します。
+実験用URL:
+
+```text
+https://yo4e.github.io/daradara/?trigger=hotkey
+```
+
+このURLをOS側のショートカットやランチャーへ割り当て、境目で1操作でBoundary Gateを出せるかを試します。ブラウザ拡張、常駐監視、対象サイトの自動ブロックはまだ実装しません。
+
+Return Window は **明示的なParking Inbox** の1方式だけです。Thought Parking保存直後やRest Mode中には一覧を出さず、Boundary Gate側から自分で「預けたものを見る」を開いたときだけ、`残す / コピー / 捨てる` を選べます。
 
 データはブラウザの `localStorage` にだけ保存します。アカウント、サーバー、外部送信はありません。
+
+実機検証の手順と判断基準は [`docs/issue-7-experiment.md`](docs/issue-7-experiment.md) にまとめます。
 
 ## プロダクト原則
 
@@ -85,7 +98,7 @@ Boundary Gate
 - OSレベルの自動介入
 - browser extension
 
-まず **Boundary Gate → Rest Mode → Thought Parking → Rest Mode** が実際に使えるかを見ます。
+Gardenやstreakへ広げず、まず **hotkey → Boundary Gate → Thought Parking → Rest Mode → later Parking Inbox** が実際に使えるかを見ます。
 
 ## 名前について
 
@@ -108,6 +121,6 @@ Boundary Gate
 
 ## Status
 
-**MVP v2 prototype / Issue #3**
+**MVP v2 / Issue #7 experiment**
 
-PR #4 のv1を基準点として、中心メカニクスを「休み方の提示」から「行動の境目を選び直すこと」へ再設計しました。2026-09-13の再調査では、次段の中心検証を **trigger layer + Thought ParkingのReturn Window** としています。
+PR #4 のv1を基準点として中心メカニクスを「行動の境目を選び直すこと」へ再設計し、PR #6 の再調査を受けて、Issue #7 では **desktop shortcut / hotkey + explicit Parking Inbox** に限定して trigger → park → rest → later return を検証します。
