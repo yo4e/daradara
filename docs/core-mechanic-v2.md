@@ -171,6 +171,8 @@ v2の最初の観察点は次。
 4. countdownを主役から外した方が休養らしいか、それとも時間の見通しがなく不安か。
 5. Thought Parking後、他の作業へ移らずRest Modeへ戻れるか。
 6. 「思いつきだけ預ける → Rest Mode」の直通経路が実際に使いたくなるか。
+7. desktop shortcut / hotkeyが「ホーム画面からわざわざ開く」より境目で使いやすいか。
+8. 明示InboxがParkingをblack holeにせず、休養中にはタスク管理感を持ち込まないか。
 
 ## 7. 現段階で保留する論点
 
@@ -190,6 +192,12 @@ v2の最初の観察点は次。
 - browser上の限定trigger
 - desktop shortcut / hotkey
 
+**Issue #7 の最小実験では desktop shortcut / hotkey を採用する。**
+
+browser extensionやOS常駐を先に作ると、権限・例外処理・配布の検証が中心仮説より大きくなるため、Web prototypeの `?trigger=hotkey` URLをOS側のショートカットへ割り当て、境目で1操作でBoundary Gateを出せるかだけを見る。
+
+これは完全な自動介入ではない。実機で「まだ自分から思い出す負担が大きい」と感じるなら、次の判断はUI追加ではなく **trigger方式を変える** になる。
+
 詳細: [`research/product-viability-retention.md`](research/product-viability-retention.md)
 
 ### Parkingの後処理 — Return Window
@@ -206,6 +214,14 @@ Thought Parkingをblack holeにしないため、後から内容を返す仕組�
 4. Return Windowで「残す / 外部へ送る / 捨てる」を選べるようにする
 
 候補は、1日1回のquiet digest、翌日の最初の能動利用時、次のwork-start trigger、明示的なParking Inbox。
+
+**Issue #7 の最小実験では明示的なParking Inboxを採用する。**
+
+- Rest Mode中には入口を出さない
+- 保存直後にも一覧を出さない
+- Boundary Gate側から本人が開いたときだけ表示する
+- 各項目は「残す / コピー / 捨てる」だけ
+- due date、priority、project、完了管理は足さない
 
 Parking入力時に毎回due dateやreview時刻を聞くことはしない。
 
