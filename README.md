@@ -101,6 +101,7 @@ Boundary Gate
 
 - [`competitors.md`](docs/research/competitors.md) — 類似サービス調査
 - [`behavior-mechanics.md`](docs/research/behavior-mechanics.md) — 競合の行動設計メカニクスと2026-09-09再確認
+- [`product-viability-retention.md`](docs/research/product-viability-retention.md) — 継続利用・trigger・Thought Parking回収の2026-09-13再調査
 - [`naming.md`](docs/research/naming.md) — `daradara` ネーミング調査
 - [`naming-darareco.md`](docs/research/naming-darareco.md) — `darareco（ダラリカ）` 一次スクリーニング
 - [`summary.md`](docs/research/summary.md) — 初期のプロダクト判断・MVP・検証仮説
@@ -109,4 +110,4 @@ Boundary Gate
 
 **MVP v2 prototype / Issue #3**
 
-PR #4 のv1を基準点として、中心メカニクスを「休み方の提示」から「行動の境目を選び直すこと」へ再設計しています。
+PR #4 のv1を基準点として、中心メカニクスを「休み方の提示」から「行動の境目を選び直すこと」へ再設計しました。2026-09-13の再調査では、次段の中心検証を **trigger layer + Thought ParkingのReturn Window** としています。
