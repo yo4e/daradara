@@ -34,7 +34,7 @@ jobs:
           git worktree add /tmp/gh-pages origin/gh-pages
 
           rsync -a --delete \
-            --exclude '.git/' \
+            --exclude '.git' \
             --exclude '.nojekyll' \
             prototype/ /tmp/gh-pages/
 
