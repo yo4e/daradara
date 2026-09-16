@@ -11,12 +11,16 @@
   <main class="app-shell">
     <section class="screen active" data-screen="start">
       <p class="eyebrow">ダラリカ / darareco</p>
+      <p class="trigger-hint" id="triggerHint" hidden>ショートカットから来た。ここで一回だけ選び直す。</p>
       <h1>もう一つやる前に、<br>一回だけ止まる。</h1>
       <p class="lead">仕事でも、SNSでも、動画でも、返信でも。止められる場所ではなく、続ける前に選び直す場所。</p>
       <div class="actions">
         <button class="primary" data-action="pause">いったん止まる</button>
         <button class="secondary wide" data-action="park-first">思いつきだけ預ける</button>
         <button class="text-button" data-action="continue">このまま続ける</button>
+      </div>
+      <div class="return-entry">
+        <button class="text-button" id="returnWindowButton" data-action="open-return" hidden>預けたものを見る</button>
       </div>
     </section>
 
@@ -73,6 +77,16 @@
         </div>
         <button class="text-button" data-action="end-rest">ここまでにする</button>
       </div>
+    </section>
+
+    <section class="screen" data-screen="return" aria-labelledby="return-title">
+      <p class="eyebrow">Return Window</p>
+      <h2 id="return-title">預けていたものを、ここで返す。</h2>
+      <p class="muted">休んでいる最中には見せない。いま自分で開いたときだけ、残す・コピーする・捨てるを選べる。</p>
+      <div class="return-list" id="returnList"></div>
+      <p class="muted" id="returnEmpty" hidden>預けているものはありません。</p>
+      <p class="parking-status return-status" id="returnStatus" aria-live="polite"></p>
+      <button class="text-button" data-action="return-done">Boundary Gateへ戻る</button>
     </section>
 
     <section class="screen" data-screen="exit" aria-labelledby="exit-title">
