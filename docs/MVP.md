@@ -75,13 +75,13 @@ v2:
 
 「このまま続ける」を正規の選択肢にする。休まなかったことを失敗扱いしない。
 
-#### MVP上の制約
+#### Issue #7 の limited trigger
 
 Web prototype は、他アプリや別サイトを開く瞬間を自動検知しない。
 
-この画面は手動で起動し、**境目に介入があったときのメカニクス**だけを試す。
+Issue #7 では trigger方式を **desktop shortcut / hotkey** 1種類に限定する。OS側から `?trigger=hotkey` 付きURLを1操作で開き、Boundary Gateへ入る。
 
-自動介入、Shortcut、browser extension等は今回の対象外。
+この実験では browser extension、常駐監視、対象サイトの自動遮断、通知スケジュールへは広げない。
 
 ### 3.2 Unwind
 
@@ -154,7 +154,27 @@ cue例:
 
 Boundary GateからParkingした場合、Unwindを挟まずRest Modeへ入ってよい。
 
-### 3.5 Exit
+### 3.5 Return Window — explicit Parking Inbox
+
+**目的:** Thought Parkingをblack holeにせず、休養中とは切り離した後刻に返す。
+
+Issue #7 では Return Window を **明示的なParking Inbox** 1方式だけにする。
+
+仕様:
+
+- Rest Mode中には入口を出さない
+- Parking保存直後にも一覧を出さない
+- Boundary Gate側の「預けたものを見る」から本人が開いたときだけ表示する
+- 預けた本文と保存時刻だけを表示する
+- 各項目に **残す / コピー / 捨てる** を置く
+- 「残す」は内容を保持し、review済み時刻だけローカルに記録する
+- 「コピー」はclipboardへコピーし、内容自体は保持する
+- 「捨てる」はその項目をローカル保存から削除する
+- due date、priority、project、完了チェック、通知は置かない
+
+Return Windowを閉じるとBoundary Gateへ戻る。Rest Modeへ自動では戻さない。
+
+### 3.6 Exit
 
 **目的:** 休養結果を採点せず介入を終える。
 
@@ -178,8 +198,10 @@ Reflection、点数、streak、達成表示は置かない。
 ```json
 [
   {
+    "id": "UUID or local id",
     "text": "あとで返信する",
-    "createdAt": "ISO-8601"
+    "createdAt": "ISO-8601",
+    "reviewedAt": "ISO-8601 | null"
   }
 ]
 ```
@@ -223,9 +245,11 @@ Rest Modeへ入った場合のみ保存する。
 - AI推薦
 - 医療助言・診断
 - タスク管理機能
-- OSレベルの自動介入
+- OSレベルの常駐・自動介入
 - browser extension
 - 通知スケジュール
+- 複数triggerの同時実装
+- quiet digest / 自動Return Window
 
 ## 6. 受け入れ条件
 
@@ -241,6 +265,10 @@ Rest Modeへ入った場合のみ保存する。
 10. Reflection、点数、streakがない。
 11. アカウントなし、ローカル保存のみで一周試せる。
 12. `prefers-reduced-motion` でambient animationが停止する。
+13. `?trigger=hotkey` 付きURLからBoundary Gateへ入れる。
+14. Parkingが存在するときだけ、Boundary Gate側に「預けたものを見る」が現れる。
+15. Return WindowはRest Mode中・Parking保存直後・Exit直後には自動表示されない。
+16. Return Windowで「残す / コピー / 捨てる」を処理できる。
 
 ## 7. 最初の観察ポイント
 
@@ -253,4 +281,4 @@ Rest Modeへ入った場合のみ保存する。
 - Parking後、本当に別行動へ行かず休養へ戻れるか
 - Rest Modeのambientな手触りは邪魔にならないか
 
-この中心ループを実機で一周してから、trigger layer、Parkingの後処理、時間設定、Garden / Mapを判断する。
+Issue #7 ではこの中心ループを **desktop shortcut / hotkey → Boundary Gate → Thought Parking → Rest Mode → later explicit Inbox** で実機数回まわす。そこで「この方向を伸ばす / trigger方式を変える / concept pivot」を判断し、Garden / Map / streak / pointsはまだ足さない。
