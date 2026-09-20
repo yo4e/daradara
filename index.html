@@ -56,13 +56,25 @@
       <h2 id="rest-title">いまは、次を決めない。</h2>
       <p class="rest-cue" id="restCue"></p>
 
-      <div class="quiet-field" aria-hidden="true">
-        <span>何もしなくていい</span>
+      <div id="restDefault">
+        <div class="quiet-field" aria-hidden="true">
+          <span>何もしなくていい</span>
+        </div>
+        <p class="quiet-note">この動きに呼吸や操作を合わせなくて大丈夫。</p>
+        <button class="text-button breathing-entry" type="button" data-action="start-breathing">呼吸のガイドを使う</button>
       </div>
-      <p class="quiet-note">この動きに呼吸や操作を合わせなくて大丈夫。</p>
+
+      <div class="breathing-panel" id="breathingPanel" hidden>
+        <p class="breathing-kicker">3分くらいの、任意のガイド</p>
+        <div class="breathing-orb" aria-hidden="true"></div>
+        <p class="breathing-phase" id="breathingPhase" aria-live="polite">ゆっくり吸う</p>
+        <p class="quiet-note breathing-note">苦しくない範囲で、いつもより少しゆっくり。表示に正確に合わせなくていい。合わなければ、いつでもやめて大丈夫。</p>
+        <button class="text-button" type="button" data-action="stop-breathing">ガイドをやめる</button>
+      </div>
+
       <p class="muted rest-time" id="restTimeMessage" aria-live="polite">5分くらいを目安に。画面から離れても、そのままでも大丈夫。</p>
 
-      <div class="rest-actions">
+      <div class="rest-actions" id="restActions">
         <button class="secondary wide" data-action="toggle-rest-parking">また思いついた</button>
         <div class="rest-parking" id="restParkingPanel" hidden>
           <form class="parking" data-parking-form data-source="rest">
