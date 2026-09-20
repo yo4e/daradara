@@ -310,7 +310,7 @@ Rest Modeの価値が「何もしなくてよい」にある以上、最初か�
 
 自然接触とストレスのsystematic reviewでは、知覚ストレスおよび複数の生理指標について概ね肯定的な結果が報告されている。
 
-- Mygind et al.系統とは別の2020 review:
+- 2020 systematic review:
 - https://pubmed.ncbi.nlm.nih.gov/33066853/
 
 自然環境への曝露と注意回復についても、working memory、cognitive flexibility、一部のattentional controlに小〜中程度の改善を示すレビューがある。
