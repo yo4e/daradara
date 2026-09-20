@@ -1,5 +1,7 @@
 # ダラリカ / darareco 最小MVP仕様 v2
 
+> この「v2」は内部の設計反復番号。2026-09-20時点で、この中心ループ + Rest Mode内のoptional paced breathingまでを**公開v1のfeature complete範囲**とする。
+
 ## 1. 目的
 
 このMVPは「正しい休養法」を教えるものではない。
@@ -36,6 +38,8 @@ v2:
    │   [2. Unwind]
    │      ↓ 1 tap
    │   [3. Rest Mode]
+   │      ├─ 何もしない（デフォルト）
+   │      ├─ 呼吸のガイド（任意・約3分） → Rest Mode
    │      ├─ 「また思いついた」 → [4. Thought Parking] → Rest Mode
    │      └─ 「ここまでにする」 → [5. Exit]
    │
@@ -107,6 +111,7 @@ Issue #7 では trigger方式を **desktop shortcut / hotkey** 1種類に限定�
 - 「いまは、次を決めない。」
 - Unwindに応じた短いcue
 - 静かな視覚変化
+- 「呼吸のガイドを使う」（任意の二次導線）
 - 「また思いついた」
 - 「ここまでにする」
 
@@ -129,8 +134,31 @@ cue例:
 視覚変化:
 
 - ごく遅いambient animationのみ
-- 呼吸や操作を同期させる指示はしない
+- 通常のRest Modeでは呼吸や操作を同期させる指示はしない
 - `prefers-reduced-motion` では停止する
+
+#### optional paced breathing
+
+**目的:** 「何もしない」を置き換えず、必要なときだけ作業モードから休息へ移るための小さな補助を借りる。
+
+仕様:
+
+- Rest Mode内の二次的なリンクからのみ開始する
+- 約3分
+- 吸気 / 呼気をゆっくり交互に案内する
+- breath holdを入れない
+- 強い深呼吸を要求しない
+- 表示へ正確に合わせることを要求しない
+- 苦しい・合わない場合はいつでも中止できる
+- 中止すると即座に通常Rest Modeへ戻る
+- 約3分で自動終了しても通常Rest Modeへ戻る
+- guide終了後にExitや作業再開へ送らない
+- score / streak / completion / achievementを持たない
+- 終了後の評価フォームを出さない
+- Unwindの回答から自動推薦しない
+- 医療効果や「自律神経を整える」等の強いclaimを置かない
+
+**重要:** 何もしないRest Modeが常にデフォルト。呼吸ガイドを選ばないことを未完了・失敗として扱わない。
 
 ### 3.4 Thought Parking
 
@@ -269,6 +297,12 @@ Rest Modeへ入った場合のみ保存する。
 14. Parkingが存在するときだけ、Boundary Gate側に「預けたものを見る」が現れる。
 15. Return WindowはRest Mode中・Parking保存直後・Exit直後には自動表示されない。
 16. Return Windowで「残す / コピー / 捨てる」を処理できる。
+17. Rest Modeのデフォルトは「何もしない」のままである。
+18. optionalな呼吸ガイドをRest Mode内から開始できる。
+19. 呼吸ガイドを途中で中止すると通常Rest Modeへ戻る。
+20. 呼吸ガイドは約3分で終了してもExitへ進まず通常Rest Modeへ戻る。
+21. 呼吸ガイドにbreath hold、score、streak、完了評価、自動推薦がない。
+22. `prefers-reduced-motion` では呼吸ガイドの視覚アニメーションも停止する。
 
 ## 7. 最初の観察ポイント
 

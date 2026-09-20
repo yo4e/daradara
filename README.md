@@ -9,17 +9,17 @@
 > **ダラリカ / darareco**  
 > だらだらすることを、ちゃんと選べるようにする。
 
-## 現在のMVP v2
+## v1
 
 最初に検証する問いは次です。
 
 > **休まず次の行動へ流れそうな境目に一度だけ介入し、続ける / 止まる / 思いつきを預ける を選び直せるようにすると、無意識の継続を休養側へ戻しやすくなるか？**
 
-MVP v2 は次の流れに絞ります。
+v1 は、MVP v2で固めた中心ループをそのまま採用し、Rest Modeに**任意の3分paced breathing**だけを補助として加えた構成です。
 
 1. **Boundary Gate** — 「いったん止まる / 思いつきだけ預ける / このまま続ける」を選ぶ。
 2. **Unwind** — 疲労名ではなく「いま何を減らしたいか」を1タップで選ぶ。
-3. **Rest Mode** — Recovery Menuや大きなcountdownを挟まず、次を決めなくてよい状態へ入る。
+3. **Rest Mode** — Recovery Menuや大きなcountdownを挟まず、次を決めなくてよい状態へ入る。何もしないのがデフォルトで、必要なら3分程度の呼吸ガイドを任意で使える。
 4. **Thought Parking** — 思いついた用事を一行だけ未来へ預け、一覧やタスク画面を見ずRest Modeへ戻る。
 5. **Exit** — 休めたかを採点せず、そのまま介入を終える。
 
@@ -44,6 +44,8 @@ desktop shortcut / hotkey
 Boundary Gate
   ├─ 続ける → 終了
   ├─ 止まる → Unwind → Rest Mode
+  │                         ├─ 何もしない（デフォルト）
+  │                         └─ 呼吸のガイド（任意）
   └─ 思いつきを預ける → Rest Mode
                          ↑
                          └─ Thought Parking
@@ -123,6 +125,10 @@ Gardenやstreakへ広げず、まず **hotkey → Boundary Gate → Thought Park
 
 ## Status
 
-**MVP v2 / Issue #7 experiment**
+**v1 feature complete — 2026-09-20**
 
-PR #4 のv1を基準点として中心メカニクスを「行動の境目を選び直すこと」へ再設計し、PR #6 の再調査を受けて、Issue #7 では **desktop shortcut / hotkey + explicit Parking Inbox** に限定して trigger → park → rest → later return を検証します。
+v1の範囲は、**desktop shortcut / hotkey → Boundary Gate → Unwind / Thought Parking → Rest Mode → later explicit Parking Inbox** と、Rest Mode内の**任意のpaced breathing**まででいったん固定します。
+
+paced breathingは休養の必須手順ではありません。何もしないRest Modeが常にデフォルトです。呼吸ガイドを使わなくても欠落扱いにせず、スコア・streak・完了判定も持ちません。
+
+ここから先は機能追加を急がず、実際に使って「この中心ループを残すか」「呼吸ガイドを残すか」を観察します。Issue #13 の実機検証はv1完成後の検証として継続します。
