@@ -115,6 +115,8 @@ Gardenやstreakへ広げず、まず **hotkey → Boundary Gate → Thought Park
 - [`competitors.md`](docs/research/competitors.md) — 類似サービス調査
 - [`behavior-mechanics.md`](docs/research/behavior-mechanics.md) — 競合の行動設計メカニクスと2026-09-09再確認
 - [`product-viability-retention.md`](docs/research/product-viability-retention.md) — 継続利用・trigger・Thought Parking回収の2026-09-13再調査
+- [`mental-recovery-methods.md`](docs/research/mental-recovery-methods.md) — メンタルリカバリー手法のゼロベース調査（Issue #11）
+- [`recovery-options-deep-dive.md`](docs/research/recovery-options-deep-dive.md) — 即時回復候補5手法の深掘り比較と最小実験案
 - [`naming.md`](docs/research/naming.md) — `daradara` ネーミング調査
 - [`naming-darareco.md`](docs/research/naming-darareco.md) — `darareco（ダラリカ）` 一次スクリーニング
 - [`summary.md`](docs/research/summary.md) — 初期のプロダクト判断・MVP・検証仮説
