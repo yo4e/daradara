@@ -4,6 +4,10 @@ const restCue = document.querySelector('#restCue');
 const restTimeMessage = document.querySelector('#restTimeMessage');
 const restParkingPanel = document.querySelector('#restParkingPanel');
 const restParkingInput = document.querySelector('#restParkingInput');
+const restDefault = document.querySelector('#restDefault');
+const breathingPanel = document.querySelector('#breathingPanel');
+const breathingPhase = document.querySelector('#breathingPhase');
+const restActions = document.querySelector('#restActions');
 const exitTitle = document.querySelector('#exit-title');
 const exitMessage = document.querySelector('#exitMessage');
 const triggerHint = document.querySelector('#triggerHint');
@@ -13,6 +17,8 @@ const returnEmpty = document.querySelector('#returnEmpty');
 const returnStatus = document.querySelector('#returnStatus');
 
 const REST_MINUTES = 5;
+const BREATH_GUIDE_MINUTES = 3;
+const BREATH_PHASE_MS = 5000;
 const THOUGHTS_KEY = 'darareco.thoughts';
 const SESSIONS_KEY = 'darareco.sessions';
 
@@ -26,6 +32,8 @@ const restCues = {
 
 let state = freshState();
 let restTimeoutId = null;
+let breathingIntervalId = null;
+let breathingTimeoutId = null;
 
 function getTriggerMode() {
   return new URLSearchParams(window.location.search).get('trigger') === 'hotkey' ? 'hotkey' : null;
@@ -119,6 +127,45 @@ function syncStartScreen() {
   returnWindowButton.hidden = readThoughts().length === 0;
 }
 
+function clearBreathingTimers() {
+  clearInterval(breathingIntervalId);
+  clearTimeout(breathingTimeoutId);
+  breathingIntervalId = null;
+  breathingTimeoutId = null;
+}
+
+function resetBreathingGuide({ finished = false } = {}) {
+  clearBreathingTimers();
+  breathingPanel.hidden = true;
+  restDefault.hidden = false;
+  restTimeMessage.hidden = false;
+  restActions.hidden = false;
+  breathingPhase.textContent = 'ゆっくり吸う';
+
+  if (finished) {
+    restCue.textContent = 'ガイドはここまで。あとは何もしなくていい。';
+  }
+}
+
+function startBreathingGuide() {
+  clearBreathingTimers();
+  restDefault.hidden = true;
+  restTimeMessage.hidden = true;
+  restActions.hidden = true;
+  breathingPanel.hidden = false;
+  breathingPhase.textContent = 'ゆっくり吸う';
+
+  let inhale = true;
+  breathingIntervalId = setInterval(() => {
+    inhale = !inhale;
+    breathingPhase.textContent = inhale ? 'ゆっくり吸う' : 'ゆっくり吐く';
+  }, BREATH_PHASE_MS);
+
+  breathingTimeoutId = setTimeout(() => {
+    resetBreathingGuide({ finished: true });
+  }, BREATH_GUIDE_MINUTES * 60 * 1000);
+}
+
 function startRest(unwind, entry = state.entry || 'pause') {
   state.entry = entry;
   state.unwind = unwind;
@@ -129,6 +176,7 @@ function startRest(unwind, entry = state.entry || 'pause') {
   restCue.textContent = restCues[unwind] || restCues.unsure;
   restTimeMessage.textContent = `${REST_MINUTES}分くらいを目安に。画面から離れても、そのままでも大丈夫。`;
   restParkingPanel.hidden = true;
+  resetBreathingGuide();
   clearParkingForms();
 
   clearTimeout(restTimeoutId);
@@ -150,6 +198,7 @@ function clearParkingForms() {
 
 function showExit(kind) {
   clearTimeout(restTimeoutId);
+  clearBreathingTimers();
 
   if (kind === 'continue') {
     exitTitle.textContent = '続けるを選んだ。';
@@ -164,9 +213,11 @@ function showExit(kind) {
 
 function reset() {
   clearTimeout(restTimeoutId);
+  clearBreathingTimers();
   state = freshState();
   clearParkingForms();
   restParkingPanel.hidden = true;
+  resetBreathingGuide();
   showScreen('start');
 }
 
@@ -321,6 +372,12 @@ document.addEventListener('click', async event => {
       break;
     case 'park-skip':
       startRest('unsure', 'park');
+      break;
+    case 'start-breathing':
+      startBreathingGuide();
+      break;
+    case 'stop-breathing':
+      resetBreathingGuide();
       break;
     case 'toggle-rest-parking':
       restParkingPanel.hidden = false;
